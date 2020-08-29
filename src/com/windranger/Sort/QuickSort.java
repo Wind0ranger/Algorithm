@@ -1,10 +1,13 @@
-package com.windranger;
+package com.windranger.Sort;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
-public class Main {
+public class QuickSort {
+
     public static void main(String[] args) {
-        List<Integer> list = Arrays.asList(1, 2, 3, 5, 7, 2, 34, 5);
+        List<Integer> list = Common.generateV2();
         List<Integer> res = quick(list);
         System.out.println(res);
     }
@@ -30,4 +33,3 @@ public class Main {
         return a;
     }
 }
-
