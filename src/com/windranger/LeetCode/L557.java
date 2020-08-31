@@ -6,7 +6,7 @@ public class L557 {
         System.out.println(l.reverseWords("Let's take LeetCode contest"));
     }
 
-    public String reverseWords(String s) {
+    public  String reverseWords(String s) {
         String[] ss = s.split(" ");
         StringBuilder res = new StringBuilder();
         for (String t : ss) {
