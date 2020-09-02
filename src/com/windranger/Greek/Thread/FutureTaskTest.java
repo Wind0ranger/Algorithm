@@ -1,11 +1,20 @@
 package com.windranger.Greek.Thread;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FutureTaskTest {
+    static class MyThreadFactory implements ThreadFactory{
+
+        private final AtomicInteger atomicInteger = new AtomicInteger(0);
+
+        @Override
+        public Thread newThread(Runnable r) {
+            return new Thread(r,"myThread - " + atomicInteger.incrementAndGet());
+        }
+    }
+    final static int poolSize = 5;
+    final static int maxPoolSize = poolSize * 4;
     public static void main(String[] args) throws ExecutionException, InterruptedException {
 
         // 创建任务T2的FutureTask
@@ -13,13 +22,13 @@ public class FutureTaskTest {
         // 创建任务T1的FutureTask
         FutureTask<String> ft1 = new FutureTask<>(new T1Task(ft2));
         // 线程T1执行任务ft1
-        Thread T1 = new Thread(ft1);
-        T1.start();
-        // 线程T2执行任务ft2
-        Thread T2 = new Thread(ft2);
-        T2.start();
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(poolSize,maxPoolSize,
+                1,TimeUnit.MINUTES, new LinkedBlockingQueue<>(), new MyThreadFactory());
+        executor.execute(ft2);
+        executor.execute(ft1);
         // 等待线程T1执行结果
         System.out.println(ft1.get());
+        System.out.println(ft2.get());
     }
 }
 
