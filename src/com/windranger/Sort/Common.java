@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Common {
-    static final int size = 20;
+    static final int size = 10;
 
     public static int[] generate() {
         int[] res = new int[size];
