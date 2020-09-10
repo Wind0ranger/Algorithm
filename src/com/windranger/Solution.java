@@ -5,49 +5,78 @@ import java.util.*;
 
 public class Solution {
     public static void main(String[] args) {
-        Solution solution = new Solution();
-        System.out.println(solution.numberofprize(9, 3, 3));
-//        System.out.println(solution.getHouses(2, new int[]{-1, 4, 5, 2, 4, 2}));
+        Node node = Node.generate();
+        AddOne(node);
     }
 
-    /**
-     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
-     * 返回能交换奖品的最大数量
-     *
-     * @param a int整型
-     * @param b int整型
-     * @param c int整型
-     * @return int整型
-     */
-    public int numberofprize(int a, int b, int c) {
-        int min = Math.min(a, Math.min(b, c));
-        int max = Math.max(a, Math.max(b, c));
-        int middle = getMiddle(a, b, c);
-        while ((max - min) >= 2) {
-            a = max - 2;
-            b = middle;
-            c = min + 1;
-            min = Math.min(a, Math.min(b, c));
-            max = Math.max(a, Math.max(b, c));
-            middle = getMiddle(a, b, c);
+    private static void AddOne(Node node) {
+        // 1. 反转链表
+        node = reverse(node);
+        // 2. 加一
+        node = addOne(node);
+        // 3. 反转
+        node = reverse(node);
+        while (node != null) {
+            System.out.println(node.val);
+            node = node.next;
         }
-        return min;
     }
 
-    private int getMiddle(int a, int b, int c) {
-        if (a > b) {
-            if (a > c) {
-                return Math.max(b, c);
+    private static Node addOne(Node node) {
+        Node root = new Node(0);
+        root.next = node;
+        int flag = 1;
+        while (node != null && flag != 0) {
+            int val = node.val + flag;
+            if (val > 9) {
+                node.val = val % 10;
+                flag = 1;
+                if (node.next == null) {
+                    node.next = new Node(flag);
+                    flag = 0;
+                } else {
+                    node = node.next;
+                }
             } else {
-                return b;
-            }
-        } else {
-            if (b > c) {
-                return Math.max(a, c);
-            } else {
-                return b;
+                node.val = val;
+                flag = 0;
             }
         }
+        return root.next;
+
+    }
+
+    private static Node reverse(Node node) {
+        Node root = new Node(0);
+        root.next = node;
+        while (node.next != null) {
+            Node next = node.next;
+            Node temp = root.next;
+            root.next = next;
+            node.next = next.next;
+            next.next = temp;
+        }
+        return root.next;
+    }
+
+    static class Node {
+        int val;
+        Node next;
+
+        public Node(int val) {
+            this.val = val;
+        }
+
+        public static Node generate() {
+            Node node = new Node(9);
+            Node a = new Node(9);
+            Node b = new Node(9);
+            node.next = a;
+            a.next = b;
+            return node;
+        }
+
+
     }
 
 }
