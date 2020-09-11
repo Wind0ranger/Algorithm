@@ -4,67 +4,76 @@ package com.windranger;
 import java.util.*;
 
 public class Main {
-    private static int sum = Integer.MIN_VALUE;
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        int n = scanner.nextInt();
-        HashMap<Integer, Node> hashMap = new HashMap<>();
-        int[][] array = new int[n + 1][2];
-        for (int i = 0; i < n; i++) {
-            int nodeId = scanner.nextInt();
-            int value = scanner.nextInt();
-            Node temp = new Node(nodeId, value);
-            hashMap.put(nodeId, temp);
-            int left = scanner.nextInt();
-            int right = scanner.nextInt();
-            array[i][0] = left;
-            array[i][1] = right;
-        }
-        for (int i = 0; i < n; i++) {
-            Node node = hashMap.get(i + 1);
-            if (array[i][0] != -1) {
-                node.left = hashMap.get(array[i][0]);
-            }
-            if (array[i][1] != -1) {
-                node.right = hashMap.get(array[i][1]);
-            }
-        }
-
-        for (int i = 1; i <= n; i++) {
-            Node root = hashMap.get(i);
-            maxGain(root, 0);
-        }
-        System.out.println(sum);
+        Main main = new Main();
+        System.out.println(main.combination(2, 3));
+//        System.out.println(Arrays.toString(main.arrayMerge(new int[]{1, 2, 4, 5}, 4, new int[]{7, 3}, 2)));
     }
 
-    public static int maxGain(Node root, int prev) {
-        if (root == null) {
-            return 0;
+    /**
+     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+     * calculate combination Number
+     *
+     * @param r int整型
+     * @param n int整型
+     * @return int整型
+     */
+    static HashMap<Integer, Long> map = new HashMap<>();
+
+    public int combination(int r, int n) {
+        if (n - r == 0 || r == 0 || n == 0) {
+            return 1;
         }
-        int left = root.value ^ prev;
-        int right = root.value ^ prev;
-        if (root.left != null) {
-            left = maxGain(root.left, left);
+        long nr = getDD(n - r, 1);
+        long nn = getDD(n, nr);
+        long rr = getDD(r, 1);
+        return (int) (nn / rr);
+    }
+
+    private long getDD(int n, long nr) {
+        long res = n / nr;
+        if (n <= 1) {
+            return 1;
+        } else {
+            if (map.containsKey(n - 1)) {
+                res = res * map.get(n - 1);
+            } else {
+                res = res * getDD(n - 1, nr);
+            }
         }
-        if (root.right != null) {
-            right = maxGain(root.right, right);
-        }
-        int res = Math.max(left, right);
-        sum = Math.max(sum, res);
+        map.put(n, res);
         return res;
     }
 
-    static class Node {
-        int nodeid;
-        int value;
-        Node left = null;
-        Node right = null;
 
-        public Node(int nodeid, int value) {
-            this.nodeid = nodeid;
-            this.value = value;
+    public int[] arrayMerge(int[] array1, int n, int[] array2, int m) {
+        int[] nums = new int[n + m];
+        int i = 0;
+        int j = m - 1;
+        int k = 0;
+        while (i < n && j >= 0) {
+            int a = array1[i];
+            int b = array2[j];
+            if (a <= b) {
+                nums[k] = a;
+                i++;
+            } else {
+                nums[k] = b;
+                j--;
+            }
+            k++;
         }
+        if (i < n) {
+            for (int l = i; l < n; l++, k++) {
+                nums[k] = array1[l];
+            }
+        } else {
+            for (int l = j; l >= 0; l--, k++) {
+                nums[k] = array2[l];
+            }
+        }
+        return nums;
+        // write code here
     }
 }
-

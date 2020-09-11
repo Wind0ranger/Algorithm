@@ -4,79 +4,69 @@ package com.windranger;
 import java.util.*;
 
 public class Solution {
+
     public static void main(String[] args) {
-        Node node = Node.generate();
-        AddOne(node);
+//        int[] nums = new int[]{70, 66, 120, 50, 25, 60, 110, 65, 18, 38, 100, 55};
+        int[] nums = new int[]{7, 6, 8, 5, 4};
+        Solution main = new Solution();
+        int res = main.test(nums);
+        System.out.println(res);
     }
 
-    private static void AddOne(Node node) {
-        // 1. 反转链表
-        node = reverse(node);
-        // 2. 加一
-        node = addOne(node);
-        // 3. 反转
-        node = reverse(node);
-        while (node != null) {
-            System.out.println(node.val);
-            node = node.next;
-        }
-    }
-
-    private static Node addOne(Node node) {
-        Node root = new Node(0);
-        root.next = node;
-        int flag = 1;
-        while (node != null && flag != 0) {
-            int val = node.val + flag;
-            if (val > 9) {
-                node.val = val % 10;
-                flag = 1;
-                if (node.next == null) {
-                    node.next = new Node(flag);
-                    flag = 0;
-                } else {
-                    node = node.next;
+    public int test(int[] nums) {
+        int n = nums.length;
+        // 0 递降，1 表示升，2 v，3w
+        int[][][] dp = new int[n][n][4];
+        // 1. 找 递增和递减
+        for (int i = 0; i < n; i++) {
+            // 其实i,i无意义，不是升/降，只是一个点
+            dp[i][i][0] = 1;
+            dp[i][i][1] = 1;
+            for (int j = i + 1; j < n; j++) {
+                // 代表不存在i,j的降
+                dp[i][j][0] = 0;
+                dp[i][j][1] = 0;
+                int jj = nums[j];
+                for (int k = i; k < j; k++) {
+                    int kk = nums[k];
+                    if (kk > jj && dp[i][k][0] + 1 > dp[i][j][0]) {
+                        // 严格递减>
+                        dp[i][j][0] = dp[i][k][0] + 1;
+                    }
+                    if (kk < jj && dp[i][k][1] + 1 > dp[i][j][1]) {
+                        // 严格递增
+                        dp[i][j][1] = dp[i][k][1] + 1;
+                    }
                 }
-            } else {
-                node.val = val;
-                flag = 0;
             }
         }
-        return root.next;
-
-    }
-
-    private static Node reverse(Node node) {
-        Node root = new Node(0);
-        root.next = node;
-        while (node.next != null) {
-            Node next = node.next;
-            Node temp = root.next;
-            root.next = next;
-            node.next = next.next;
-            next.next = temp;
+        // 2. 找v
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 2; j < n; j++) {
+                // 这里j=i+2，跟上面不同
+                dp[i][j][2] = 0;
+                for (int k = i + 1; k < j; k++) {
+                    // 一定要存在降，若=0说明不存在降，那么不可能构成降升
+                    if (dp[i][k][0] > 0 && dp[k][j][1] > 0 && dp[i][k][0] + dp[k][j][1] - 1 > dp[i][j][2]) {
+                        dp[i][j][2] = dp[i][k][0] + dp[k][j][1] - 1;
+                    }
+                }
+            }
         }
-        return root.next;
-    }
-
-    static class Node {
-        int val;
-        Node next;
-
-        public Node(int val) {
-            this.val = val;
+        // 3. 找w
+        int res = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 2; j < n; j++) {
+                dp[i][j][3] = 0;
+                for (int k = i + 1; k < j; k++) {
+                    if (dp[i][k][2] > 0 && dp[k][j][2] > 0 && dp[i][k][2] + dp[k][j][2] - 1 > dp[i][j][3]) {
+                        dp[i][j][3] = dp[i][k][2] + dp[k][j][2] - 1;
+                    }
+                }
+                res = Math.max(res, dp[i][j][3]);
+            }
         }
-
-        public static Node generate() {
-            Node node = new Node(9);
-            Node a = new Node(9);
-            Node b = new Node(9);
-            node.next = a;
-            a.next = b;
-            return node;
-        }
-
-
+        return res;
     }
-
 }
+

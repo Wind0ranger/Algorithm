@@ -3,11 +3,25 @@ package com.windranger.IO.BIO;
 import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class IOServer {
+    static class MyyThreadFactory implements ThreadFactory {
+        static AtomicInteger atomicInteger = new AtomicInteger();
 
+        @Override
+        public Thread newThread(Runnable r) {
+            return new Thread(r,"Thread-" + atomicInteger.getAndIncrement());
+        }
+    }
+    static class MyyReject implements RejectedExecutionHandler {
+
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            System.out.println(r.toString());
+        }
+    }
     public static void main(String[] args) throws Exception {
 
         //线程池机制
@@ -15,7 +29,8 @@ public class IOServer {
         //思路
         //1. 创建一个线程池
         //2. 如果有客户端连接，就创建一个线程，与之通讯(单独写一个方法)
-        ExecutorService newCachedThreadPool = Executors.newCachedThreadPool();
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(3, 3, 1, TimeUnit.SECONDS, new LinkedBlockingDeque<>(3), new MyyThreadFactory(), new MyyReject());
+//        ExecutorService newCachedThreadPool = Executors.newCachedThreadPool();
 
         //创建ServerSocket
         ServerSocket serverSocket = new ServerSocket(6666);
@@ -31,7 +46,7 @@ public class IOServer {
             System.out.println("连接到一个客户端");
 
             //就创建一个线程，与之通讯(单独写一个方法)
-            newCachedThreadPool.execute(() -> { //我们重写
+            threadPoolExecutor.execute(() -> {
                 //可以和客户端通讯
                 handler(socket);
             });
@@ -56,8 +71,8 @@ public class IOServer {
                 System.out.println("线程信息 id =" + Thread.currentThread().getId() + " 名字=" + Thread.currentThread().getName());
 
                 System.out.println("read....");
-                int read =  inputStream.read(bytes);
-                if(read != -1) {
+                int read = inputStream.read(bytes);
+                if (read != -1) {
                     System.out.println(new String(bytes, 0, read
                     )); //输出客户端发送的数据
                 } else {
@@ -66,13 +81,13 @@ public class IOServer {
             }
 
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             System.out.println("关闭和client的连接");
             try {
                 socket.close();
-            }catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
