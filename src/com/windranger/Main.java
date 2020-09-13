@@ -1,79 +1,42 @@
 package com.windranger;
 
-
 import java.util.*;
 
+//-1 0 1 2 -1 -4
 public class Main {
+    static HashSet<String> res = new HashSet<>();
 
     public static void main(String[] args) {
-        Main main = new Main();
-        System.out.println(main.combination(2, 3));
-//        System.out.println(Arrays.toString(main.arrayMerge(new int[]{1, 2, 4, 5}, 4, new int[]{7, 3}, 2)));
+        Scanner sc = new Scanner(System.in);
+        String[] ss = sc.nextLine().split("\\s+");
+        int[] nums = new int[ss.length];
+        for (int i = 0; i < nums.length; i++) {
+            nums[i] = Integer.parseInt(ss[i].replace(" ", ""));
+        }
+        Arrays.sort(nums);
+        backTrack(nums, 0, new LinkedList<>(), 0);
+        for (String re : res) {
+            System.out.println(re);
+        }
     }
 
-    /**
-     * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
-     * calculate combination Number
-     *
-     * @param r int整型
-     * @param n int整型
-     * @return int整型
-     */
-    static HashMap<Integer, Long> map = new HashMap<>();
-
-    public int combination(int r, int n) {
-        if (n - r == 0 || r == 0 || n == 0) {
-            return 1;
-        }
-        long nr = getDD(n - r, 1);
-        long nn = getDD(n, nr);
-        long rr = getDD(r, 1);
-        return (int) (nn / rr);
-    }
-
-    private long getDD(int n, long nr) {
-        long res = n / nr;
-        if (n <= 1) {
-            return 1;
-        } else {
-            if (map.containsKey(n - 1)) {
-                res = res * map.get(n - 1);
-            } else {
-                res = res * getDD(n - 1, nr);
+    private static void backTrack(int[] nums, int index, LinkedList<Integer> track, int sum) {
+        if (track.size() == 3) {
+            if (sum == 0) {
+                StringBuilder builder = new StringBuilder();
+                for (Integer integer : track) {
+                    builder.append(integer).append(" ");
+                }
+                res.add(builder.subSequence(0, builder.length() - 1).toString());
             }
+            return;
         }
-        map.put(n, res);
-        return res;
-    }
-
-
-    public int[] arrayMerge(int[] array1, int n, int[] array2, int m) {
-        int[] nums = new int[n + m];
-        int i = 0;
-        int j = m - 1;
-        int k = 0;
-        while (i < n && j >= 0) {
-            int a = array1[i];
-            int b = array2[j];
-            if (a <= b) {
-                nums[k] = a;
-                i++;
-            } else {
-                nums[k] = b;
-                j--;
-            }
-            k++;
+        for (int j = index; j < nums.length; j++) {
+            track.add(nums[j]);
+            sum += nums[j];
+            backTrack(nums, j + 1, track, sum);
+            track.removeLast();
+            sum -= nums[j];
         }
-        if (i < n) {
-            for (int l = i; l < n; l++, k++) {
-                nums[k] = array1[l];
-            }
-        } else {
-            for (int l = j; l >= 0; l--, k++) {
-                nums[k] = array2[l];
-            }
-        }
-        return nums;
-        // write code here
     }
 }
