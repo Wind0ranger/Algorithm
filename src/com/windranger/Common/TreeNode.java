@@ -12,19 +12,17 @@ public class TreeNode {
     }
 
     public static TreeNode generate() {
-        TreeNode a = new TreeNode(5);
-        TreeNode b = new TreeNode(2);
-        TreeNode c = new TreeNode(3);
-        TreeNode d = new TreeNode(2);
-        TreeNode e = new TreeNode(4);
-        TreeNode f = new TreeNode(3);
-        TreeNode g = new TreeNode(1);
+        TreeNode a = new TreeNode(10);
+        TreeNode b = new TreeNode(5);
+        TreeNode c = new TreeNode(15);
+        TreeNode d = new TreeNode(3);
+        TreeNode e = new TreeNode(7);
+        TreeNode f = new TreeNode(18);
         a.left = b;
         a.right = c;
-        c.left = d;
-        c.right = e;
-        d.left = f;
-        d.right = g;
+        b.left = d;
+        b.right = e;
+        c.right = f;
         return a;
     }
 
